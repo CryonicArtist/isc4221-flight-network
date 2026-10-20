@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>U.S. Flight Network Explorer</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <h1>U.S. Flight Network Explorer</h1>
+    <p class="subtitle">Interactive Air Transit Graph Analysis (OpenFlights Snapshot)</p>
+  </header>
+
+  <main class="dashboard">
+    <!-- Panel A: Network Map -->
+    <section class="panel panel-a">
+      <div class="panel-header">
+        <h2><span class="panel-tag">A</span> Network Map</h2>
+        <button id="reset-map-btn" class="btn btn-secondary">Reset View</button>
+      </div>
+      <div id="map"></div>
+      <div class="map-legend">
+        <span class="legend-item"><span class="dot hub-dot"></span> Major Hub</span>
+        <span class="legend-item"><span class="dot spoke-dot"></span> Regional Airport</span>
+        <span class="legend-item"><span class="line route-line"></span> Direct Route</span>
+        <span class="legend-item"><span class="line active-route-line"></span> Selected Route</span>
+      </div>
+    </section>
+
+    <!-- Side Control Column (Panels B, C, D) -->
+    <div class="control-column">
+      
+      <!-- Panel B: Airport Lookup -->
+      <section class="panel panel-b">
+        <h2><span class="panel-tag">B</span> Airport Lookup</h2>
+        <div class="search-box">
+          <input type="text" id="lookup-input" placeholder="Enter IATA Code (e.g. TLH)" />
+          <button id="lookup-btn" class="btn">Search</button>
+        </div>
+        <div id="lookup-results" class="results-container">
+          <p class="placeholder-text">Search for an airport or click any node on the map.</p>
+        </div>
+      </section>
+
+      <!-- Panel C: Network Summary -->
+      <section class="panel panel-c">
+        <h2><span class="panel-tag">C</span> Network Summary</h2>
+        <div class="stat-cards">
+          <div class="stat-card">
+            <span class="stat-num" id="stat-airports">-</span>
+            <span class="stat-label">Airports</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="stat-edges">-</span>
+            <span class="stat-label">Edges</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="stat-components">-</span>
+            <span class="stat-label">Components</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="stat-top-hub">-</span>
+            <span class="stat-label">Largest Hub</span>
+          </div>
+        </div>
+
+        <h3>Top 10 Hubs (Click bar to select)</h3>
+        <div id="hub-barchart" class="barchart-container"></div>
+
+        <h3>Connected Components</h3>
+        <div id="components-list" class="components-container"></div>
+      </section>
+
+      <!-- Panel D: Connection Checker -->
+      <section class="panel panel-d">
+        <h2><span class="panel-tag">D</span> Connection Checker</h2>
+        <div class="route-selectors">
+          <div class="select-group">
+            <label for="select-origin">Origin:</label>
+            <select id="select-origin"></select>
+          </div>
+          <div class="select-group">
+            <label for="select-dest">Destination:</label>
+            <select id="select-dest"></select>
+          </div>
+        </div>
+        <button id="check-connection-btn" class="btn btn-primary">Check Connection</button>
+        <div id="connection-results" class="results-container">
+          <p class="placeholder-text">Select origin and destination airports to check path existence.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Panel E: About the Data -->
+  <footer class="panel panel-e">
+    <h2><span class="panel-tag">E</span> About the Data</h2>
+    <p>
+      This interactive tool visualizes the U.S. domestic flight network using a snapshot from the public 
+      <strong>OpenFlights Database</strong> (frozen around 2014) under the <em>Open Database License</em>. 
+      Nodes represent U.S. domestic airports with valid IATA codes, and undirected edges represent direct non-stop commercial flights operated by any carrier.
+    </p>
+    <p class="footer-links">
+      <a href="https://github.com/jpatokal/openflights" target="_blank">OpenFlights Repository</a> | 
+      <a href="report.html" id="report-link">Read Full Lab Report (report.md)</a>
+    </p>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Main Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
