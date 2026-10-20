@@ -4,7 +4,6 @@ let airportMarkers = {};
 let routePolylines = [];
 let highlightedPolylines = [];
 
-// Initialize Dashboard on Page Load
 document.addEventListener("DOMContentLoaded", () => {
   initMap();
   fetchData();
@@ -18,30 +17,28 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("reset-map-btn").addEventListener("click", resetMapHighlights);
 });
 
-// 1. Initialize Leaflet Map
 function initMap() {
   map = L.map("map").setView([38.0, -96.0], 4);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    attribution: '&copy; OpenStreetMap contributors',
     maxZoom: 10,
     minZoom: 3
   }).addTo(map);
 }
 
-// 2. Fetch Network Data JSON
 async function fetchData() {
   try {
+    // Relative path works whether hosted in docs/ or at root of public repo
     const resp = await fetch("data/network.json");
     networkData = await resp.json();
     renderSummary();
     renderDropdowns();
     renderMapNodesAndEdges();
   } catch (err) {
-    console.error("Error loading network data:", err);
+    console.error("Error loading data/network.json:", err);
   }
 }
 
-// 3. Render Panel C Summary Statistics & Bar Charts
 function renderSummary() {
   const s = networkData.summary;
   document.getElementById("stat-airports").innerText = s.total_airports;
@@ -49,7 +46,7 @@ function renderSummary() {
   document.getElementById("stat-components").innerText = s.num_components;
   document.getElementById("stat-top-hub").innerText = networkData.hubs[0][0];
 
-  // Render Top Hubs Bar Chart
+  // Hubs Bar Chart
   const hubContainer = document.getElementById("hub-barchart");
   hubContainer.innerHTML = "";
   const maxDeg = networkData.hubs[0][1];
@@ -69,7 +66,7 @@ function renderSummary() {
     hubContainer.appendChild(row);
   });
 
-  // Render Connected Components Badges
+  // Connected Components
   const compContainer = document.getElementById("components-list");
   compContainer.innerHTML = "";
   networkData.components.forEach((comp, idx) => {
@@ -81,7 +78,6 @@ function renderSummary() {
   });
 }
 
-// 4. Render Dropdowns for Panel D
 function renderDropdowns() {
   const origSelect = document.getElementById("select-origin");
   const destSelect = document.getElementById("select-dest");
@@ -90,22 +86,18 @@ function renderDropdowns() {
 
   networkData.sorted_codes.forEach((code) => {
     const name = networkData.airports[code]?.city || code;
-    const opt1 = new Option(`${code} - ${name}`, code);
-    const opt2 = new Option(`${code} - ${name}`, code);
-    origSelect.add(opt1);
-    destSelect.add(opt2);
+    origSelect.add(new Option(`${code} - ${name}`, code));
+    destSelect.add(new Option(`${code} - ${name}`, code));
   });
 
-  // Set default selection (TLH and SEA)
   origSelect.value = "TLH";
   destSelect.value = "SEA";
 }
 
-// 5. Render Map Nodes & Base Edges
 function renderMapNodesAndEdges() {
   const airports = networkData.airports;
 
-  // Render Edges (Thin semi-transparent lines)
+  // Base Edges
   networkData.edges.forEach(([u, v]) => {
     if (airports[u] && airports[v]) {
       const line = L.polyline(
@@ -116,7 +108,7 @@ function renderMapNodesAndEdges() {
     }
   });
 
-  // Render Airport Nodes
+  // Airport Markers
   Object.keys(airports).forEach((iata) => {
     const ap = airports[iata];
     const marker = L.circleMarker([ap.lat, ap.lon], {
@@ -133,27 +125,19 @@ function renderMapNodesAndEdges() {
   });
 }
 
-// 6. Binary Search Implementation (Counts Comparisons)
+// Binary Search in JS
 function binarySearchJS(sortedCodes, target) {
-  let low = 0;
-  let high = sortedCodes.length - 1;
-  let comparisons = 0;
-
+  let low = 0, high = sortedCodes.length - 1, comparisons = 0;
   while (low <= high) {
     let mid = Math.floor((low + high) / 2);
     comparisons++;
-    if (sortedCodes[mid] === target) {
-      return { index: mid, comparisons: comparisons };
-    } else if (sortedCodes[mid] < target) {
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
+    if (sortedCodes[mid] === target) return { index: mid, comparisons };
+    else if (sortedCodes[mid] < target) low = mid + 1;
+    else high = mid - 1;
   }
-  return { index: -1, comparisons: comparisons };
+  return { index: -1, comparisons };
 }
 
-// 7. Panel B Airport Lookup Handler
 function handleLookup() {
   const query = document.getElementById("lookup-input").value.trim().toUpperCase();
   if (!query) return;
@@ -183,7 +167,6 @@ function handleLookup() {
   }
 }
 
-// Helper: Get Direct Destinations
 function getDirectDestinations(iata) {
   const dests = [];
   networkData.edges.forEach(([u, v]) => {
@@ -193,7 +176,6 @@ function getDirectDestinations(iata) {
   return dests;
 }
 
-// Select & Highlight Airport on Map
 function selectAirport(iata) {
   resetMapHighlights();
   const ap = networkData.airports[iata];
@@ -201,7 +183,6 @@ function selectAirport(iata) {
 
   map.setView([ap.lat, ap.lon], 6);
 
-  // Highlight direct routes
   networkData.edges.forEach(([u, v]) => {
     if (u === iata || v === iata) {
       const line = L.polyline(
@@ -213,12 +194,9 @@ function selectAirport(iata) {
     }
   });
 
-  // Populate Panel B if not already searched
   document.getElementById("lookup-input").value = iata;
-  handleLookup();
 }
 
-// Highlight Entire Connected Component
 function highlightComponent(compNodes) {
   resetMapHighlights();
   const nodeSet = new Set(compNodes);
@@ -241,7 +219,7 @@ function highlightComponent(compNodes) {
   });
 }
 
-// 8. Panel D Connection Checker (Live JS Implementation of Connection Algorithm)
+// Live Connection Algorithm in JS for Panel D
 function pathExistsJS(origin, destination) {
   const adj = {};
   networkData.edges.forEach(([u, v]) => {
@@ -266,9 +244,7 @@ function pathExistsJS(origin, destination) {
 
     for (let node of newSet) {
       for (let nbr of (adj[node] || [])) {
-        if (untouched.has(nbr)) {
-          nextNew.add(nbr);
-        }
+        if (untouched.has(nbr)) nextNew.add(nbr);
       }
     }
 
@@ -277,24 +253,13 @@ function pathExistsJS(origin, destination) {
     newSet = nextNew;
 
     if (newSet.has(destination)) {
-      return {
-        found: true,
-        iterations: n_iterations,
-        fewest_flights: n_iterations,
-        reached: Array.from(used)
-      };
+      return { found: true, iterations: n_iterations, fewest_flights: n_iterations, reached: Array.from(used) };
     }
   }
 
-  return {
-    found: false,
-    iterations: n_iterations,
-    fewest_flights: null,
-    reached: Array.from(used)
-  };
+  return { found: false, iterations: n_iterations, fewest_flights: null, reached: Array.from(used) };
 }
 
-// Connection Checker Handler
 function handleConnectionCheck() {
   const orig = document.getElementById("select-origin").value;
   const dest = document.getElementById("select-dest").value;
@@ -309,7 +274,6 @@ function handleConnectionCheck() {
       <p><strong>Iterations:</strong> ${result.iterations}</p>
       <p><strong>Fewest Flights:</strong> ${result.fewest_flights} flight(s)</p>
     `;
-    // Highlight start and end markers
     airportMarkers[orig]?.setStyle({ fillColor: "#2e7d32", radius: 9 });
     airportMarkers[dest]?.setStyle({ fillColor: "#2e7d32", radius: 9 });
   } else {
@@ -323,7 +287,6 @@ function handleConnectionCheck() {
   }
 }
 
-// Reset Map Styling
 function resetMapHighlights() {
   highlightedPolylines.forEach(line => map.removeLayer(line));
   highlightedPolylines = [];
