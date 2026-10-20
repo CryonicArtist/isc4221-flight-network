@@ -283,17 +283,3 @@ body {
   font-size: 0.88rem;
   line-height: 1.5;
 }
-
-.footer-links {
-  margin-top: 8px;
-}
-
-.footer-links a {
-  color: #800000;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.footer-links a:hover {
-  text-decoration: underline;
-}
