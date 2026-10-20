@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>U.S. Flight Network Explorer</title>
   
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Custom Styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -105,17 +103,11 @@
     <p>
       This interactive tool visualizes the U.S. domestic flight network using a snapshot from the public 
       <strong>OpenFlights Database</strong> (frozen around 2014) under the <em>Open Database License</em>. 
-      Nodes represent U.S. domestic airports with valid IATA codes, and undirected edges represent direct non-stop commercial flights operated by any carrier.
-    </p>
-    <p class="footer-links">
-      <a href="https://github.com/jpatokal/openflights" target="_blank">OpenFlights Repository</a> | 
-      <a href="report.html" id="report-link">Read Full Lab Report (report.md)</a>
+      Nodes represent U.S. domestic airports with valid IATA codes, and undirected edges represent direct non-stop commercial flights.
     </p>
   </footer>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Main Application Logic -->
   <script src="app.js"></script>
 </body>
 </html>
